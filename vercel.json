@@ -2,14 +2,14 @@
     "version": 2,
     "builds": [
       {
-        "src": "Cargo.toml",
-        "use": "@vercel/rust"
+        "src": "Dockerfile",
+        "use": "@vercel/docker"
       }
     ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "target/release/my-rust-app"
+        "dest": "/"
       }
     ]
   }
