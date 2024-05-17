@@ -35,7 +35,7 @@ struct GameState {
 }
 
 fn read_csv() -> Result<Vec<Company>, Error> {
-    let file = File::open("f500data.csv")?;
+    let file = File::open("data/f500data.csv")?;
     let mut reader = csv::Reader::from_reader(file);
     let mut companies = Vec::new();
 
