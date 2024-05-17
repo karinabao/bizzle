@@ -13,14 +13,24 @@ COPY ./src ./src
 # Build for release
 RUN cargo build --release
 
-# Now create a small image to hold our binary
+# Now create a small image to hold our binary and static files
 FROM debian:buster-slim
-RUN apt-get update && apt-get install -y libssl-dev && apt-get clean
+
+# Install nginx
+RUN apt-get update && apt-get install -y nginx && apt-get clean
+
+# Copy the Rust binary
 COPY --from=builder /bizzle/target/release/bizzle /usr/local/bin/bizzle
 
-# We need to specify the port on which the app will run
-ENV PORT 8080
-EXPOSE 8080
+# Copy the static files
+COPY ./static /usr/share/nginx/html
 
-# Run the binary
-CMD ["bizzle"]
+# Replace the default nginx config with our own
+RUN rm /etc/nginx/sites-enabled/default
+COPY nginx.conf /etc/nginx/sites-enabled/default
+
+# Expose the port on which the app will run
+EXPOSE 80
+
+# Run nginx and the Rust binary
+CMD ["sh", "-c", "nginx && bizzle"]
