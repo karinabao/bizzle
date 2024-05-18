@@ -1,87 +1,102 @@
 document.addEventListener('DOMContentLoaded', function() {
-    fetchCompanyInfo();
+    let score = {
+        market_cap: null,
+        revenue: null,
+        profit: null,
+        assets: null,
+        employees: null
+    }
 
-    // Auto-focus on the first input box when the page loads
-    const firstGuessInput = document.getElementById('first-guess');
-    firstGuessInput.focus();
-});
-
-document.getElementById('guessForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    handleSubmitGuess();
-});
-
-function fetchCompanyInfo() {
     fetch('/company')
         .then(response => response.json())
         .then(data => {
-            const companyInfo = document.getElementById('company-info');
-            companyInfo.textContent = `Guess the market cap for: ${data.name}`;
+            const companyName = document.getElementById('company-name');
+            companyName.textContent = `Guess the financials for: ${data.name}`;
+
+            const companyDescription = document.getElementById('company-description');
+            companyDescription.textContent = `Description: ${data.description}\n\n`;
+
+            document.getElementById('market-cap-question').textContent = "Is the market cap lower or higher than $40.0B?";
+            document.getElementById('revenue-question').textContent = "Is the revenue lower or higher than $30.0B?";
+            document.getElementById('profit-question').textContent = "Is the profit lower or higher than $10.0B?";
+            document.getElementById('assets-question').textContent = "Is the value of assets higher or lower than $25.0B?";
+            document.getElementById('employees-question').textContent = "Is the number of employees higher or lower than 30,000?";
         })
         .catch(error => console.error('Error fetching company:', error));
-}
 
-function handleSubmitGuess() {
-    const guessInputs = [
-        document.getElementById('first-guess'),
-        document.getElementById('second-guess'),
-        document.getElementById('third-guess'),
-        document.getElementById('fourth-guess')
-    ];
-    const responseIds = [
-        'first-response',
-        'second-response',
-        'third-response',
-        'fourth-response'
-    ];
-
-    let guess, guessNumber;
-
-    for (let i = 0; i < guessInputs.length; i++) {
-        if (!guessInputs[i].disabled) {
-            guess = guessInputs[i].value;
-            guessNumber = i + 1;
-            break;
-        }
-    }
-
-    fetch('/submit_guess', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({ guess, guessNumber }),
-    })
-    .then(response => response.text())
-    .then(data => {
-        updateResponseMessage(responseIds[guessNumber - 1], data);
-        if (data.includes('Congratulations!')) {
-            disableAllInputs(guessInputs);
-            document.getElementById('submit-btn').disabled = true;
-        } else if (guessNumber < guessInputs.length) {
-            setNextGuessInput(guessInputs, guessNumber);
-        } else {
-            disableAllInputs(guessInputs);
-            document.getElementById('submit-btn').disabled = true;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
+    // Add event listeners for the buttoms
+    document.getElementById('market-cap-higher').addEventListener('click', function() {
+        submitGuess('market_cap_higher', 'response-market-cap', ['market-cap-higher', 'market-cap-lower'], 'market_cap');
     });
-}
+    document.getElementById('market-cap-lower').addEventListener('click', function() {
+        submitGuess('market_cap_lower', 'response-market-cap', ['market-cap-higher', 'market-cap-lower'], 'market_cap');
+    });
+    document.getElementById('revenue-higher').addEventListener('click', function() {
+        submitGuess('revenue_higher', 'response-revenue', ['revenue-higher', 'revenue-lower'], 'revenue');
+    });
+    document.getElementById('revenue-lower').addEventListener('click', function() {
+        submitGuess('revenue_lower', 'response-revenue', ['revenue-higher', 'revenue-lower'], 'revenue');
+    });
+    document.getElementById('profit-higher').addEventListener('click', function() {
+        submitGuess('profit_higher', 'response-profit', ['profit-higher', 'profit-lower'], 'profit');
+    });
+    document.getElementById('profit-lower').addEventListener('click', function() {
+        submitGuess('profit_lower', 'response-profit', ['profit-higher', 'profit-lower'], 'profit');
+    });
+    document.getElementById('assets-higher').addEventListener('click', function() {
+        submitGuess('assets_higher', 'response-assets', ['assets-higher', 'assets-lower'], 'assets');
+    });
+    document.getElementById('assets-lower').addEventListener('click', function() {
+        submitGuess('assets_lower', 'response-assets', ['assets-higher', 'assets-lower'], 'assets');
+    });
+    document.getElementById('employees-higher').addEventListener('click', function() {
+        submitGuess('employees_higher', 'response-employees', ['employees-higher', 'employees-lower'], 'employees');
+    });
+    document.getElementById('employees-lower').addEventListener('click', function() {
+        submitGuess('employees_lower', 'response-employees', ['employees-higher', 'employees-lower'], 'employees');
+    });
 
-function setNextGuessInput(guessInputs, guessNumber) {
-    guessInputs[guessNumber - 1].disabled = true;
-    guessInputs[guessNumber].disabled = false;
-    guessInputs[guessNumber].focus();
-}
-
-function updateResponseMessage(responseId, message) {
-    document.getElementById(responseId).textContent = message;
-}
-
-function disableAllInputs(guessInputs) {
-    for (const input of guessInputs) {
-        input.disabled = true;
+       document.getElementById('play-again').addEventListener('click', function() {
+           location.reload();
+       });
+       function submitGuess(guess, responseElementId, buttonIdsToDisable, scoreKey){
+        fetch('/submit_guess', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ guess_type: guess }),
+        })
+        .then(response => response.text())
+        .then(data => {
+            const responseElement = document.getElementById(responseElementId);
+            responseElement.textContent = data;
+            responseElement.classList.remove('hidden');
+    
+            buttonIdsToDisable.forEach(buttonId => {
+                document.getElementById(buttonId).disabled = true;
+            });
+    
+            score[scoreKey] = data.includes('Correct!') ? 'Correct!' : 'Incorrect';
+    
+            if (score.market_cap !== null && score.revenue !== null && score.profit !== null && score.assets !== null && score.employees !== null) {
+                displayOverallScore()
+            }
+        })
+        .catch(error => {
+            console.error('Error', error)
+        })
     }
-}
+    function displayOverallScore() {
+        const overallScore = Object.values(score).filter(value => value === 'Correct!').length;
+        const percentage = overallScore / 5 * 100;  
+        const overallScoreElement = document.getElementById('overall-score');
+    
+        overallScoreElement.textContent = `Your scored: ${percentage}% Share your score on X (formerly Twitter)!`;
+        overallScoreElement.classList.remove('hidden');
+    }
+});
+
+
+
+

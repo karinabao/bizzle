@@ -1,30 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Market Cap Guessing Game</title>
-    <script src="/static/index.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bizzle</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>Market Cap Guessing Game</h1>
-    <div id="company-info"></div>
-    <form id="guessForm">
-        <label for="first-guess">Enter your first guess for the market cap (in billions):</label>
-        <input type="number" step="0.01" id="first-guess" name="first-guess" required>
-        <p id="first-response"></p>
-        
-        <label for="second-guess">Enter your second guess for the market cap (in billions):</label>
-        <input type="number" step="0.01" id="second-guess" name="second-guess" disabled required>
-        <p id="second-response"></p>
+    <h1 id="company-name"></h1> <!-- Placeholder for the company name -->
+    <h2 id="company-description"></h2> <!-- Placeholder for the company name -->
+    
+    <h3 id="market-cap-question"></h3> <!-- Placeholder for the market cap question -->
+    <div id="buttons" name="market-cap-guess">
+        <button id="market-cap-higher">Higher</button>
+        <button id="market-cap-lower">Lower</button>
+    </div>
+    <p id="response-market-cap" class="hidden"></p> <!-- Placeholder for the response -->
+    
+    <h3 id="revenue-question"></h3> <!-- Placeholder for the market cap question -->
+    <div id="buttons" name="revenue-guess">
+        <button id="revenue-higher">Higher</button>
+        <button id="revenue-lower">Lower</button>
+    </div>
+    <p id="response-revenue" class="hidden"></p> <!-- Placeholder for the response -->
 
-        <label for="third-guess">Enter your third guess for the market cap (in billions):</label>
-        <input type="number" step="0.01" id="third-guess" name="third-guess" disabled required>
-        <p id="third-response"></p>
+    <h3 id="profit-question"></h3> <!-- Placeholder for the market cap question -->
+    <div id="buttons" name="profit-guess">
+        <button id="profit-higher">Higher</button>
+        <button id="profit-lower">Lower</button>
+    </div>
+    <p id="response-profit" class="hidden"></p> <!-- Placeholder for the response -->
 
-        <label for="fourth-guess">Enter your final guess for the market cap (in billions):</label>
-        <input type="number" step="0.01" id="fourth-guess" name="fourth-guess" disabled required>
-        <p id="fourth-response"></p>
-        
-        <input type="submit" value="Submit" id="submit-btn">
-    </form>
+    <h3 id="assets-question"></h3> <!-- Placeholder for the market cap question -->
+    <div id="buttons" name="assets-guess">
+        <button id="assets-higher">Higher</button>
+        <button id="assets-lower">Lower</button>
+    </div>
+    <p id="response-assets" class="hidden"></p> <!-- Placeholder for the response -->
+
+    <h3 id="employees-question"></h3> <!-- Placeholder for the market cap question -->
+    <div id="buttons" name="employees-guess">
+        <button id="employees-higher">Higher</button>
+        <button id="employees-lower">Lower</button>
+    </div>
+    <p id="response-employees" class="hidden"></p> <!-- Placeholder for the response -->
+    
+    <h1 id="overall-score" class="hidden"></h1> <!-- Placeholder for the response -->
+
+    <button id="play-again">Play Again</button>
+
+    <script src="/index.js"></script> <!-- Include the JavaScript file -->
 </body>
 </html>
