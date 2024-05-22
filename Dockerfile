@@ -31,7 +31,7 @@ COPY ./data /usr/share/bizzle/data
 
 # Copy the nginx config
 COPY nginx.conf /etc/nginx/sites-available/default
-RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 # Expose the port on which the app will run
 EXPOSE 80
