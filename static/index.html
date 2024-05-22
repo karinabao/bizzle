@@ -8,11 +8,17 @@
         .hidden {
             display: none;
         }
+        .correct {
+            color: green;
+        }
+        .incorrect {
+            color: red;
+        }
     </style>
 </head>
 <body>
-    <h1 id="company-name"></h1> <!-- Placeholder for the company name -->
-    <h2 id="company-description"></h2> <!-- Placeholder for the company name -->
+    <p id="company-name"></p> <!-- Placeholder for the company name -->
+    <p id="company-description"></p> <!-- Placeholder for the company name -->
     
     <h3 id="market-cap-question"></h3> <!-- Placeholder for the market cap question -->
     <div id="buttons" name="market-cap-guess">
@@ -49,7 +55,12 @@
     </div>
     <p id="response-employees" class="hidden"></p> <!-- Placeholder for the response -->
     
-    <h1 id="overall-score" class="hidden"></h1> <!-- Placeholder for the response -->
+    </br>
+
+    <p id="overall-score" class="hidden"></p> <!-- Placeholder for the response -->
+    <p id="overall-stats" class="hidden"></p> <!-- Placeholder for the overall stats -->
+    
+    <p id="timer">Time spent: 0s</p> 
 
     <button id="play-again">Play Again</button>
 
