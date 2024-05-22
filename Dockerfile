@@ -14,8 +14,8 @@ COPY ./src ./src
 # Build the Rust project in release mode
 RUN cargo build --release
 
-# Use a smaller base image for the final stage to reduce image size
-FROM debian:buster-slim
+# Use a more up-to-date base image with the required glibc version
+FROM debian:bullseye-slim
 
 # Install nginx
 RUN apt-get update && apt-get install -y nginx && apt-get clean
