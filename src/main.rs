@@ -30,8 +30,7 @@ struct AppState {
     total_games: RwLock<u32>,
     correct_guesses: RwLock<u32>,
     incorrect_guesses: RwLock<u32>,
-    total_time: RwLock<u32>, // Add total_time field
-
+    total_time: RwLock<u32>, 
 }
 
 #[derive(FromForm)]
@@ -43,7 +42,6 @@ struct Guess {
 struct TimePayload {
     time: u32,
 }
-
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Stats {
@@ -60,7 +58,6 @@ fn read_csv() -> Result<Vec<Company>, std::io::Error> {
 
     for result in rdr.deserialize() {
         let record: Company = result?;
-        // println!("Read company: {:?}", record.rank); // Debug output
         companies.push(record);
     }
     Ok(companies)

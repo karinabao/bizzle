@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
         employees: null
     }
 
-    // let total_time = 0;
     let timer = 0;
     let timerInterval;
     const timerElement = document.getElementById('timer');
@@ -31,7 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
             companyDescription.textContent = `Description: ${data.description}\n\n`;
 
             document.getElementById('market-cap-question').textContent = `Is the market cap lower or higher than ${data.rank <= 250 ? "$40.0B" : "$10.0B"}?`;
-            // console.log(data.rank);
             document.getElementById('revenue-question').textContent = `Is the revenue lower or higher than ${data.rank <= 250 ? "$30.0B" : "$7.5B"}?`;
             document.getElementById('profit-question').textContent = `Is the profit lower or higher than ${data.rank <= 250 ? "$10.0B" : "$2.5B"}?`;
             document.getElementById('assets-question').textContent = `Is the value of assets higher or lower than ${data.rank <= 250 ? "$25.0B" : "$6.0B"}?`;

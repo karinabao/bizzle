@@ -1,0 +1,32 @@
+@font-face {
+    font-family: 'TestFinancierDisplay';
+    src: url('/fonts/TestFinancierDisplay/TestFinancierDisplay-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'TestFinancierDisplay', serif;
+    text-align: center;
+    background-color: #f3e2d9;
+}
+
+.hidden {
+    display: none;
+}
+
+.correct {
+    color: green;
+}
+
+.incorrect {
+    color: red;
+}
+
+#company-name, #company-description, h3, p, button {
+    margin: 10px auto;
+}
+
+h3 {
+    color: #990F3D;
+}
