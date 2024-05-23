@@ -1,27 +1,27 @@
-# Use the official Rust image from the Docker Hub as the build environment
-FROM rust:latest AS builder
+# Use a musl-based Rust image for static linking
+FROM ekidd/rust-musl-builder AS builder
 
-# Create a new binary project in the /app directory
+# Create a new binary project in the /bizzle directory
 RUN USER=root cargo new --bin bizzle
-WORKDIR /bizzle
+WORKDIR /home/rust/src/bizzle
 
 # Copy the Cargo.toml and Cargo.lock files to the build environment
 COPY ./Cargo.toml ./Cargo.lock ./
 
-# Copy the source files to the build environment
-COPY ./src ./src
-
-# Build the Rust project in release mode
+# Fetch dependencies
 RUN cargo build --release
 
-# Use a more up-to-date base image with the required glibc version
-FROM ubuntu:20.04
+# Now copy the actual source code
+COPY ./src ./src
 
-# Install nginx
-RUN apt-get update && apt-get install -y nginx && apt-get clean
+# Rebuild the project with the actual source code
+RUN cargo build --release --target x86_64-unknown-linux-musl
 
-# Copy the compiled Rust binary from the builder stage
-COPY --from=builder /bizzle/target/release/bizzle /usr/local/bin/bizzle
+# Use a minimal base image for the runtime stage
+FROM scratch
+
+# Copy the statically linked Rust binary from the builder stage
+COPY --from=builder /home/rust/src/bizzle/target/x86_64-unknown-linux-musl/release/bizzle /usr/local/bin/bizzle
 
 # Copy the static files for the frontend to the nginx html directory
 COPY ./static /usr/share/nginx/html
@@ -29,15 +29,8 @@ COPY ./static /usr/share/nginx/html
 # Copy the data files to the appropriate directory
 COPY ./data /usr/share/bizzle/data
 
-# Copy the nginx configuration file to the appropriate location
-COPY nginx.conf /etc/nginx/sites-available/default
-
-# Create a symbolic link to enable the nginx configuration
-# The -sf option forces the creation of the link, overwriting if it exists
-RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-
 # Expose port 80 to be accessible outside the container
 EXPOSE 80
 
-# Command to run nginx and the Rust application, also tail nginx error log for debugging
-CMD ["sh", "-c", "nginx -g 'daemon off;' & bizzle & tail -f /var/log/nginx/error.log"]
+# Command to run the Rust application
+CMD ["/usr/local/bin/bizzle"]
