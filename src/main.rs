@@ -9,14 +9,14 @@ use num_format::{Locale, ToFormattedString};
 #[derive(Debug, Deserialize, Serialize, Clone)]
 struct Company {
     name: String,
-    // ticker: String,
+    ticker: String,
     rank: u32,
-    // year: u32,
+    year: u32,
     industry: String,
     sector: String,
     headquarters_state: String,
     headquarters_city: String,
-    market_value_mil: u64,
+    marketcap: u64,
     revenue_mil: u64,
     profit_mil: u64,
     asset_mil: u64,
@@ -54,7 +54,7 @@ struct Stats {
 }
 
 fn read_csv() -> Result<Vec<Company>, std::io::Error> {
-    let file = File::open("data/f500data.csv")?;
+    let file = File::open("data/f500data-shortlist.csv")?;
     let mut rdr = csv::Reader::from_reader(file);
     let mut companies = Vec::new();
 
@@ -99,7 +99,7 @@ fn submit_guess(guess: Form<Guess>, state: &State<AppState>) -> String {
         let assets_estimate = if company.rank <= 250 { 25_000 } else { 6_000 }; // value in millions
         let employees_estimate = if company.rank <= 250 { 30_000 } else { 7_500 }; // raw value
 
-        let formatted_market_cap_billion = format_billion(company.market_value_mil);
+        let formatted_market_cap_billion = format_billion(company.marketcap);
         let formatted_revenue_billion = format_billion(company.revenue_mil);
         let formatted_profit_billion = format_billion(company.profit_mil);
         let formatted_assets_billion = format!("${:.1}B", company.asset_mil as f64 / 1_000.0);
@@ -111,7 +111,7 @@ fn submit_guess(guess: Form<Guess>, state: &State<AppState>) -> String {
 
         let result = match guess.guess_type.as_str() {
             "market_cap_higher" => {
-                if company.market_value_mil > market_cap_estimate {
+                if company.marketcap > market_cap_estimate {
                     *correct_guesses += 1;
                     format!("Correct! The actual market cap of {} is {} which is higher than ${:.1}B", company.name, formatted_market_cap_billion, market_cap_estimate as f64 / 1_000.0)
                 } else {
@@ -120,7 +120,7 @@ fn submit_guess(guess: Form<Guess>, state: &State<AppState>) -> String {
                 }
             }
             "market_cap_lower" => {
-                if company.market_value_mil < market_cap_estimate {
+                if company.marketcap < market_cap_estimate {
                     *correct_guesses += 1;
                     format!("Correct! The actual market cap of {} is {} which is lower than ${:.1}B", company.name, formatted_market_cap_billion, market_cap_estimate as f64 / 1_000.0)
                 } else {
