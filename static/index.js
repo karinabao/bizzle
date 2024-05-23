@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     let score = {
-        market_cap: null,
+        marketcap: null,
         revenue: null,
         profit: null,
         assets: null,
         employees: null
-    }
+    };
 
     let timer = 0;
     let timerInterval;
@@ -23,13 +23,9 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch('/company')
         .then(response => response.json())
         .then(data => {
-            const companyName = document.getElementById('company-name');
-            companyName.textContent = `Bizzle: Guess the financials for ${data.name}`;
-
-            const companyDescription = document.getElementById('company-description');
-            companyDescription.textContent = `Description: ${data.description}\n\n`;
-
-            document.getElementById('market-cap-question').textContent = `Is the market cap lower or higher than ${data.rank <= 250 ? "$40.0B" : "$10.0B"}?`;
+            document.getElementById('company-name').textContent = `Guess the financials for: ${data.name}`;
+            document.getElementById('company-description').textContent = `Description: ${data.description}`;
+            document.getElementById('marketcap-question').textContent = `Is the market cap lower or higher than ${data.rank <= 250 ? "$40.0B" : "$10.0B"}?`;
             document.getElementById('revenue-question').textContent = `Is the revenue lower or higher than ${data.rank <= 250 ? "$30.0B" : "$7.5B"}?`;
             document.getElementById('profit-question').textContent = `Is the profit lower or higher than ${data.rank <= 250 ? "$10.0B" : "$2.5B"}?`;
             document.getElementById('assets-question').textContent = `Is the value of assets higher or lower than ${data.rank <= 250 ? "$25.0B" : "$6.0B"}?`;
@@ -37,43 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error fetching company:', error));
 
-    // Add event listeners for the buttoms
-    document.getElementById('market-cap-higher').addEventListener('click', function() {
-        submitGuess('market_cap_higher', 'response-market-cap', ['market-cap-higher', 'market-cap-lower'], 'market_cap', this);
-    });
-    document.getElementById('market-cap-lower').addEventListener('click', function() {
-        submitGuess('market_cap_lower', 'response-market-cap', ['market-cap-higher', 'market-cap-lower'], 'market_cap', this);
-    });
-    document.getElementById('revenue-higher').addEventListener('click', function() {
-        submitGuess('revenue_higher', 'response-revenue', ['revenue-higher', 'revenue-lower'], 'revenue', this);
-    });
-    document.getElementById('revenue-lower').addEventListener('click', function() {
-        submitGuess('revenue_lower', 'response-revenue', ['revenue-higher', 'revenue-lower'], 'revenue', this);
-    });
-    document.getElementById('profit-higher').addEventListener('click', function() {
-        submitGuess('profit_higher', 'response-profit', ['profit-higher', 'profit-lower'], 'profit', this);
-    });
-    document.getElementById('profit-lower').addEventListener('click', function() {
-        submitGuess('profit_lower', 'response-profit', ['profit-higher', 'profit-lower'], 'profit', this);
-    });
-    document.getElementById('assets-higher').addEventListener('click', function() {
-        submitGuess('assets_higher', 'response-assets', ['assets-higher', 'assets-lower'], 'assets', this);
-    });
-    document.getElementById('assets-lower').addEventListener('click', function() {
-        submitGuess('assets_lower', 'response-assets', ['assets-higher', 'assets-lower'], 'assets', this);
-    });
-    document.getElementById('employees-higher').addEventListener('click', function() {
-        submitGuess('employees_higher', 'response-employees', ['employees-higher', 'employees-lower'], 'employees', this);
-    });
-    document.getElementById('employees-lower').addEventListener('click', function() {
-        submitGuess('employees_lower', 'response-employees', ['employees-higher', 'employees-lower'], 'employees', this);
-    });
-
-    document.getElementById('play-again').addEventListener('click', function() {
-           location.reload();
-       });
-
-    function submitGuess(guess, responseElementId, buttonIdsToDisable, scoreKey, selectedButtonId){
+    function submitGuess(guess, responseElementId, buttonIdsToDisable, scoreKey, selectedButton) {
         fetch('/submit_guess', {
             method: 'POST',
             headers: {
@@ -85,21 +45,21 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             const responseElement = document.getElementById(responseElementId);
             responseElement.textContent = data;
-
-            // Remove any existing class
             responseElement.classList.remove('correct', 'incorrect');
             responseElement.classList.add(data.includes('Correct!') ? 'correct' : 'incorrect');
-    
+
             buttonIdsToDisable.forEach(buttonId => {
                 document.getElementById(buttonId).disabled = true;
             });
 
-            selectedButtonId.classList.add('selected');
-    
+            selectedButton.classList.add('selected');
+
             score[scoreKey] = data.includes('Correct!') ? 'Correct!' : 'Incorrect';
-    
-            if (score.market_cap !== null && score.revenue !== null && score.profit !== null && score.assets !== null && score.employees !== null) {
-                displayOverallScore()
+
+            console.log(score);
+
+            if (score.marketcap !== null && score.revenue !== null && score.profit !== null && score.assets !== null && score.employees !== null) {
+                displayOverallScore();
                 fetch('/stats', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -107,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     const statsElement = document.getElementById('overall-stats');
                     let accuracy = (data.correct_guesses / (data.total_games * 5) * 100).toFixed(2);
                     statsElement.textContent = `Overall accuracy: ${accuracy}% Games Played: ${data.total_games}, Correct Guesses: ${data.correct_guesses}, Incorrect Guesses: ${data.incorrect_guesses}`;
@@ -116,29 +75,39 @@ document.addEventListener('DOMContentLoaded', function() {
                     clearInterval(timerInterval);
                 })
                 .catch(error => console.error('Error fetching stats:', error));
-
             }
         })
         .catch(error => {
-            console.error('Error', error)
-        })
+            console.error('Error', error);
+        });
     }
+
     function displayOverallScore() {
-        document.getElementById('response-market-cap').classList.remove('hidden');
+        document.getElementById('response-marketcap').classList.remove('hidden');
         document.getElementById('response-revenue').classList.remove('hidden');
         document.getElementById('response-profit').classList.remove('hidden');
         document.getElementById('response-assets').classList.remove('hidden');
         document.getElementById('response-employees').classList.remove('hidden');
 
         const overallScore = Object.values(score).filter(value => value === 'Correct!').length;
-        const percentage = overallScore / 5 * 100;  
+        const percentage = overallScore / 5 * 100;
         const overallScoreElement = document.getElementById('overall-score');
 
-        overallScoreElement.textContent = `Your scored: ${percentage}% Share your score on X (formerly Twitter)!`;
+        overallScoreElement.textContent = `Your score: ${percentage}% Share your score on X (formerly Twitter)!`;
         overallScoreElement.classList.remove('hidden');
     }
+
+    document.querySelectorAll('button[id$="-higher"], button[id$="-lower"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const [metric, guess] = this.id.split('-');
+            const responseElementId = `response-${metric}`;
+            const buttonIdsToDisable = [`${metric}-higher`, `${metric}-lower`];
+            console.log(metric, guess, responseElementId, buttonIdsToDisable, metric, this);
+            submitGuess(`${metric}_${guess}`, responseElementId, buttonIdsToDisable, metric, this);
+        });
+    });
+
+    document.getElementById('play-again').addEventListener('click', function() {
+        location.reload();
+    });
 });
-
-
-
-

@@ -7,52 +7,81 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2 id="company-name"></h2> <!-- Placeholder for the company name -->
-    <p id="company-description"></p> <!-- Placeholder for the company name -->
-    
-    <h3 id="market-cap-question"></h3> <!-- Placeholder for the market cap question -->
-    <div id="buttons" name="market-cap-guess">
-        <button id="market-cap-higher">Higher</button>
-        <button id="market-cap-lower">Lower</button>
-    </div>
-    <p id="response-market-cap" class="hidden"></p> <!-- Placeholder for the response -->
-    
-    <h3 id="revenue-question"></h3> <!-- Placeholder for the market cap question -->
-    <div id="buttons" name="revenue-guess">
-        <button id="revenue-higher">Higher</button>
-        <button id="revenue-lower">Lower</button>
-    </div>
-    <p id="response-revenue" class="hidden"></p> <!-- Placeholder for the response -->
+    <div id="container">
+        <header>
+            <h1>Bizzle</h1>
+            <p id="company-name"></p>
+        </header>
 
-    <h3 id="profit-question"></h3> <!-- Placeholder for the market cap question -->
-    <div id="buttons" name="profit-guess">
-        <button id="profit-higher">Higher</button>
-        <button id="profit-lower">Lower</button>
+        <main>
+            <section id="company-details">
+                <p id="company-description"></p>
+            </section>
+
+            <section id="questions">
+                <div class="question">
+                <h3 id="marketcap-question"></h3> 
+                <div id="buttons" name="marketcap-guess">
+                    <button id="marketcap-higher">Higher</button>
+                    <button id="marketcap-lower">Lower</button>
+                </div>
+                <p id="response-marketcap" class="hidden"></p> 
+
+                <div class="question">
+                    <h3 id="revenue-question"></h3> 
+                    <div id="buttons" name="revenue-guess">
+                        <button id="revenue-higher">Higher</button>
+                        <button id="revenue-lower">Lower</button>
+                    </div>
+                </div>
+                <p id="response-revenue" class="hidden"></p>
+
+                <div class="question">
+                    <h3 id="profit-question"></h3> 
+                    <div id="buttons" name="profit-guess">
+                        <button id="profit-higher">Higher</button>
+                        <button id="profit-lower">Lower</button>
+                    </div>
+                </div>
+                <p id="response-profit" class="hidden"></p>
+
+                <div class="question">
+                    <h3 id="assets-question"></h3> 
+                    <div id="buttons" name="assets-guess">
+                        <button id="assets-higher">Higher</button>
+                        <button id="assets-lower">Lower</button>
+                    </div>
+                </div>
+                <p id="response-assets" class="hidden"></p> 
+
+                <div class="question">
+                    <h3 id="employees-question"></h3> 
+                    <div id="buttons" name="employees-guess">
+                        <button id="employees-higher">Higher</button>
+                        <button id="employees-lower">Lower</button>
+                    </div>
+                </div>
+                <p id="response-employees" class="hidden"></p> 
+
+
+                </div>
+            </section>
+
+            <section id="results">
+                <p id="overall-score" class="hidden"></p>
+                <p id="overall-stats" class="hidden"></p>
+                <p id="timer">Time spent: 0s</p>
+                <button id="play-again">Play Again</button>
+                <button id="share-results">Share Results</button>
+            </section>
+
+
+        </main>
+        <footer>
+            <p>&copy; 2024 Bizzle. All rights reserved.</p>
+        </footer>
+
     </div>
-    <p id="response-profit" class="hidden"></p> <!-- Placeholder for the response -->
-
-    <h3 id="assets-question"></h3> <!-- Placeholder for the market cap question -->
-    <div id="buttons" name="assets-guess">
-        <button id="assets-higher">Higher</button>
-        <button id="assets-lower">Lower</button>
-    </div>
-    <p id="response-assets" class="hidden"></p> <!-- Placeholder for the response -->
-
-    <h3 id="employees-question"></h3> <!-- Placeholder for the market cap question -->
-    <div id="buttons" name="employees-guess">
-        <button id="employees-higher">Higher</button>
-        <button id="employees-lower">Lower</button>
-    </div>
-    <p id="response-employees" class="hidden"></p> <!-- Placeholder for the response -->
-    
-    </br>
-
-    <p id="overall-score" class="hidden"></p> <!-- Placeholder for the response -->
-    <p id="overall-stats" class="hidden"></p> <!-- Placeholder for the overall stats -->
-    
-    <p id="timer">Time spent: 0s</p> 
-
-    <button id="play-again">Play Again</button>
 
     <script src="/index.js"></script> <!-- Include the JavaScript file -->
 </body>

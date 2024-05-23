@@ -133,11 +133,11 @@ fn submit_guess(guess: Form<Guess>, state: &State<AppState>) -> String {
             (10_000, 7_500, 2_500, 6_000, 7_500)
         };
 
-        let (market_cap_estimate, revenue_estimate, profit_estimate, assets_estimate, employees_estimate) = estimates;
+        let (marketcap_estimate, revenue_estimate, profit_estimate, assets_estimate, employees_estimate) = estimates;
 
         let result = match guess.guess_type.as_str() {
-            "market_cap_higher" | "market_cap_lower" => {
-                evaluate_guess(company, &guess.guess_type.split('_').last().unwrap(), market_cap_estimate, company.marketcap, "B")
+            "marketcap_higher" | "marketcap_lower" => {
+                evaluate_guess(company, &guess.guess_type.split('_').last().unwrap(), marketcap_estimate, company.marketcap, "B")
             }
             "revenue_higher" | "revenue_lower" => {
                 evaluate_guess(company, &guess.guess_type.split('_').last().unwrap(), revenue_estimate, company.revenue_mil, "B")

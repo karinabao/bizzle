@@ -12,17 +12,20 @@
     font-style: normal;
 }
 
-@font-face {
-    font-family: 'TestMetric';
-    src: url('/fonts/TestMetric/TestMetric-Regular.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-}
-
 body {
     font-family: 'TestFinancierDisplay', serif;
     text-align: center;
     background-color: #f3e2d9;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .hidden {
@@ -37,20 +40,98 @@ body {
     color: red;
 }
 
-.selected {
-    background-color: #990F3D;
-    color: #f3e2d9;
+#company-name, #company-description, h3, p, button {
+    margin: 10px auto;
 }
 
-p, button {
+header {
+    margin-bottom: 20px;
+}
+
+header h1 {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-family: 'Georgia', serif;
+    font-size: 1.2em;
+    color: #333;
+}
+
+main {
+    margin-bottom: 20px;
+}
+
+/* p {
     font-family: 'Georgia', serif;
 }
 
 h3 {
     color: #990F3D;
-    font-family: 'TestMetric', sans-serif;
 }
 
 h2 {
+    font-family: 'TestFinancierDisplay';
     font-weight: bold;
+} */
+
+#company-details {
+    margin-bottom: 20px;
+}
+
+#company-details p {
+    font-family: 'Georgia', serif;
+    font-size: 1em;
+    color: #333;
+}
+
+#questions .question {
+    margin-bottom: 20px;
+}
+
+#questions h3 {
+    color: #990F3D;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+button {
+    font-family: 'TestFinancierDisplay', serif;
+    font-size: 16px;
+    padding: 10px 20px;
+    margin: 10px;
+    border: 2px solid #990F3D;
+    background-color: #f3e2d9;
+    color: #990F3D;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+button:hover {
+    background-color: #990F3D;
+    color: #f3e2d9;
+}
+
+button:disabled {
+    background-color: #ddd;
+    color: #999;
+    border: 2px solid #ccc;
+    cursor: not-allowed;
+}
+
+.selected {
+    outline: 2px solid #990F3D;
+    background-color: #e0bfbf; /* A slightly darker shade */
+}
+
+#results {
+    margin-top: 20px;
+}
+
+footer {
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: #666;
 }
