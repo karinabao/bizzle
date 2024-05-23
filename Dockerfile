@@ -15,7 +15,7 @@ COPY ./src ./src
 RUN cargo build --release
 
 # Use a more up-to-date base image with the required glibc version
-FROM debian:bullseye-slim
+FROM ubuntu:20.04
 
 # Install nginx
 RUN apt-get update && apt-get install -y nginx && apt-get clean

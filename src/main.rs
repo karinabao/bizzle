@@ -11,7 +11,7 @@ struct Company {
     name: String,
     ticker: String,
     rank: u32,
-    year: u32,
+    // year: u32,
     industry: String,
     sector: String,
     headquarters_state: String,
@@ -54,7 +54,7 @@ struct Stats {
 }
 
 fn read_csv() -> Result<Vec<Company>, std::io::Error> {
-    let file = File::open("data/f500data-shortlist.csv")?;
+    let file = File::open("data/f500data.csv")?;
     let mut rdr = csv::Reader::from_reader(file);
     let mut companies = Vec::new();
 
@@ -257,7 +257,7 @@ fn update_stats(state: &State<AppState>, payload: Json<TimePayload>) -> Result<J
         incorrect_guesses,
         total_time
     };
-    
+
     Ok(Json(stats))
 }
 
