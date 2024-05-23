@@ -97,12 +97,33 @@ document.addEventListener('DOMContentLoaded', function() {
         overallScoreElement.classList.remove('hidden');
     }
 
+    function getShareText() {
+        const scoreText = `Bizzle ${Object.values(score).filter(value => value === 'Correct!').length}/5`;
+        const resultIcons = Object.values(score).map(value => value === 'Correct!' ? '🟩' : '🟥').join('\n');
+        return `${scoreText}\n${resultIcons}`;
+    }
+
+    function copyToClipboard(text) {
+        const textarea = document.createElement('textarea');
+        textarea.textContent = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+    }
+
+    document.getElementById('share-results').addEventListener('click', function() {
+        const shareText = getShareText();
+        copyToClipboard(shareText);
+        alert('Results copied to clipboard!');
+    });
+
     document.querySelectorAll('button[id$="-higher"], button[id$="-lower"]').forEach(button => {
         button.addEventListener('click', function() {
             const [metric, guess] = this.id.split('-');
             const responseElementId = `response-${metric}`;
             const buttonIdsToDisable = [`${metric}-higher`, `${metric}-lower`];
-            console.log(metric, guess, responseElementId, buttonIdsToDisable, metric, this);
+            // console.log(metric, guess, responseElementId, buttonIdsToDisable, metric, this);
             submitGuess(`${metric}_${guess}`, responseElementId, buttonIdsToDisable, metric, this);
         });
     });

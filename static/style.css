@@ -12,12 +12,6 @@
     font-style: normal;
 }
 
-body {
-    font-family: 'TestFinancierDisplay', serif;
-    text-align: center;
-    background-color: #f3e2d9;
-}
-
 .container {
     width: 90%;
     max-width: 800px;
@@ -38,6 +32,64 @@ body {
 
 .incorrect {
     color: red;
+}
+
+button {
+    font-family: 'TestFinancierDisplay', serif;
+    font-size: 16px;
+    padding: 10px 20px;
+    margin: 5px;
+    border: 2px solid #990F3D;
+    background-color: #f3e2d9;
+    color: #990F3D;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    display: inline-flex;
+    align-items: center; /* Align items in the center vertically */
+    justify-content: center; /* Align items in the center horizontally */
+    height: 40px; /* Set a fixed height for both buttons */
+    line-height: 1; /* Ensure the line-height doesn't affect button height */
+    box-sizing: border-box; /* Ensure padding and border are included in the height */
+}
+
+button svg.icon {
+    width: 20px; /* Adjust the width as needed */
+    height: 20px; /* Adjust the height as needed */
+    margin-right: 8px; /* Space between the icon and the text */
+    transition: fill 0.3s, stroke 0.3s; /* Smooth transition for color changes */
+    vertical-align: middle; /* Ensure vertical alignment */
+}
+
+button:hover {
+    background-color: #990F3D;
+    color: #f3e2d9;
+}
+
+button:hover svg.icon g {
+    stroke: #f3e2d9; /* Change the stroke color to match the text color on hover */
+}
+
+button:disabled {
+    background-color: #ddd;
+    color: #999;
+    border: 2px solid #ccc;
+    cursor: not-allowed;
+}
+
+#play-again, #share-results {
+    height: 40px; /* Ensure both buttons have the same fixed height */
+    padding: 10px 20px; /* Consistent padding for both buttons */
+    box-sizing: border-box; /* Ensure padding and border are included in the height */
+    display: inline-flex; /* Use inline-flex for proper alignment */
+    align-items: center; /* Align items vertically in the center */
+    justify-content: center; /* Align items horizontally in the center */
+}
+
+body {
+    font-family: 'TestFinancierDisplay', serif;
+    text-align: center;
+    background-color: #f3e2d9;
 }
 
 #company-name, #company-description, h3, p, button {
@@ -63,19 +115,6 @@ main {
     margin-bottom: 20px;
 }
 
-/* p {
-    font-family: 'Georgia', serif;
-}
-
-h3 {
-    color: #990F3D;
-}
-
-h2 {
-    font-family: 'TestFinancierDisplay';
-    font-weight: bold;
-} */
-
 #company-details {
     margin-bottom: 20px;
 }
@@ -96,34 +135,10 @@ h2 {
     margin-bottom: 10px;
 }
 
-button {
-    font-family: 'TestFinancierDisplay', serif;
-    font-size: 16px;
-    padding: 10px 20px;
-    margin: 10px;
-    border: 2px solid #990F3D;
-    background-color: #f3e2d9;
-    color: #990F3D;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-button:hover {
-    background-color: #990F3D;
-    color: #f3e2d9;
-}
-
-button:disabled {
-    background-color: #ddd;
-    color: #999;
-    border: 2px solid #ccc;
-    cursor: not-allowed;
-}
-
-.selected {
-    outline: 2px solid #990F3D;
-    background-color: #e0bfbf; /* A slightly darker shade */
+button.selected {
+    outline: 2px solid #0056b3; /* A vibrant blue color for the outline */
+    background-color: #cce5ff; /* A lighter blue shade for the background */
+    color: #0056b3; /* Match the text color with the outline color */
 }
 
 #results {
