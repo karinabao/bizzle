@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             const companyName = document.getElementById('company-name');
-            companyName.textContent = `Guess the financials for: ${data.name}`;
+            companyName.textContent = `Bizzle: Guess the financials for ${data.name}`;
 
             const companyDescription = document.getElementById('company-description');
             companyDescription.textContent = `Description: ${data.description}\n\n`;
@@ -39,41 +39,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add event listeners for the buttoms
     document.getElementById('market-cap-higher').addEventListener('click', function() {
-        submitGuess('market_cap_higher', 'response-market-cap', ['market-cap-higher', 'market-cap-lower'], 'market_cap');
+        submitGuess('market_cap_higher', 'response-market-cap', ['market-cap-higher', 'market-cap-lower'], 'market_cap', this);
     });
     document.getElementById('market-cap-lower').addEventListener('click', function() {
-        submitGuess('market_cap_lower', 'response-market-cap', ['market-cap-higher', 'market-cap-lower'], 'market_cap');
+        submitGuess('market_cap_lower', 'response-market-cap', ['market-cap-higher', 'market-cap-lower'], 'market_cap', this);
     });
     document.getElementById('revenue-higher').addEventListener('click', function() {
-        submitGuess('revenue_higher', 'response-revenue', ['revenue-higher', 'revenue-lower'], 'revenue');
+        submitGuess('revenue_higher', 'response-revenue', ['revenue-higher', 'revenue-lower'], 'revenue', this);
     });
     document.getElementById('revenue-lower').addEventListener('click', function() {
-        submitGuess('revenue_lower', 'response-revenue', ['revenue-higher', 'revenue-lower'], 'revenue');
+        submitGuess('revenue_lower', 'response-revenue', ['revenue-higher', 'revenue-lower'], 'revenue', this);
     });
     document.getElementById('profit-higher').addEventListener('click', function() {
-        submitGuess('profit_higher', 'response-profit', ['profit-higher', 'profit-lower'], 'profit');
+        submitGuess('profit_higher', 'response-profit', ['profit-higher', 'profit-lower'], 'profit', this);
     });
     document.getElementById('profit-lower').addEventListener('click', function() {
-        submitGuess('profit_lower', 'response-profit', ['profit-higher', 'profit-lower'], 'profit');
+        submitGuess('profit_lower', 'response-profit', ['profit-higher', 'profit-lower'], 'profit', this);
     });
     document.getElementById('assets-higher').addEventListener('click', function() {
-        submitGuess('assets_higher', 'response-assets', ['assets-higher', 'assets-lower'], 'assets');
+        submitGuess('assets_higher', 'response-assets', ['assets-higher', 'assets-lower'], 'assets', this);
     });
     document.getElementById('assets-lower').addEventListener('click', function() {
-        submitGuess('assets_lower', 'response-assets', ['assets-higher', 'assets-lower'], 'assets');
+        submitGuess('assets_lower', 'response-assets', ['assets-higher', 'assets-lower'], 'assets', this);
     });
     document.getElementById('employees-higher').addEventListener('click', function() {
-        submitGuess('employees_higher', 'response-employees', ['employees-higher', 'employees-lower'], 'employees');
+        submitGuess('employees_higher', 'response-employees', ['employees-higher', 'employees-lower'], 'employees', this);
     });
     document.getElementById('employees-lower').addEventListener('click', function() {
-        submitGuess('employees_lower', 'response-employees', ['employees-higher', 'employees-lower'], 'employees');
+        submitGuess('employees_lower', 'response-employees', ['employees-higher', 'employees-lower'], 'employees', this);
     });
 
     document.getElementById('play-again').addEventListener('click', function() {
            location.reload();
        });
 
-    function submitGuess(guess, responseElementId, buttonIdsToDisable, scoreKey){
+    function submitGuess(guess, responseElementId, buttonIdsToDisable, scoreKey, selectedButtonId){
         fetch('/submit_guess', {
             method: 'POST',
             headers: {
@@ -93,6 +93,8 @@ document.addEventListener('DOMContentLoaded', function() {
             buttonIdsToDisable.forEach(buttonId => {
                 document.getElementById(buttonId).disabled = true;
             });
+
+            selectedButtonId.classList.add('selected');
     
             score[scoreKey] = data.includes('Correct!') ? 'Correct!' : 'Incorrect';
     

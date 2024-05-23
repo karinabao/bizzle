@@ -115,13 +115,9 @@ fn evaluate_guess(company: &Company, guess_type: &str, estimate: u64, actual: u6
     let comparison = if is_correct { "higher" } else { "lower" };
 
     format!(
-        "{}! The actual value of {} is {} which is {} than ${:.1}{}",
+        "{}! Actual: {}",
         if is_correct { "Correct" } else { "Incorrect" },
-        company.name,
-        formatted_value,
-        comparison,
-        estimate as f64 / 1_000.0,
-        unit
+        formatted_value
     )
 }
 
