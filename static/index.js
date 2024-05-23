@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let timer = 0;
     let timerInterval;
     const timerElement = document.getElementById('timer');
+    let shareText;
 
     function startTimer() {
         timerInterval = setInterval(() => {
@@ -72,6 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     statsElement.textContent = `Overall accuracy: ${accuracy}% Games Played: ${data.total_games}, Correct Guesses: ${data.correct_guesses}, Incorrect Guesses: ${data.incorrect_guesses}`;
                     statsElement.classList.remove('hidden');
                     timerElement.textContent = `Time: ${timer}s. \n Average time per round: ${(data.total_time / data.total_games).toFixed(2)}s`;
+                    shareText = getShareText(data);
                     clearInterval(timerInterval);
                 })
                 .catch(error => console.error('Error fetching stats:', error));
@@ -97,10 +99,14 @@ document.addEventListener('DOMContentLoaded', function() {
         overallScoreElement.classList.remove('hidden');
     }
 
-    function getShareText() {
+    function getShareText(data) {
         const scoreText = `Bizzle ${Object.values(score).filter(value => value === 'Correct!').length}/5`;
         const resultIcons = Object.values(score).map(value => value === 'Correct!' ? '🟩' : '🟥').join('\n');
-        return `${scoreText}\n${resultIcons}`;
+        let accuracy = (data.correct_guesses / (data.total_games * 5) * 100).toFixed(2);
+        let averageTime = (data.total_time / data.total_games).toFixed(2);
+        const overallStats = `I've played ${data.total_games} games and with an average of ${averageTime}s per round with ${accuracy}% accuracy`;
+        const shareLink = `Can you beat me? https://bizzle.onrender.com/`;
+        return `${scoreText}\n${resultIcons}\n${overallStats}\n${shareLink}`;
     }
 
     function copyToClipboard(text) {
@@ -113,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.getElementById('share-results').addEventListener('click', function() {
-        const shareText = getShareText();
         copyToClipboard(shareText);
         alert('Results copied to clipboard!');
     });

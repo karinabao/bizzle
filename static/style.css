@@ -136,9 +136,9 @@ main {
 }
 
 button.selected {
-    outline: 2px solid #0056b3; /* A vibrant blue color for the outline */
-    background-color: #cce5ff; /* A lighter blue shade for the background */
-    color: #0056b3; /* Match the text color with the outline color */
+    background-color: #990F3D;
+    color: #f3e2d9;
+    border: 2px solid #990F3D;
 }
 
 #results {
