@@ -97,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         overallScoreElement.textContent = `Your score: ${percentage}% Share your score on X (formerly Twitter)!`;
         overallScoreElement.classList.remove('hidden');
+        document.getElementById('share-results').classList.remove('hidden');
     }
 
     function getShareText(data) {
@@ -119,9 +120,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.getElementById('share-results').addEventListener('click', function() {
-        copyToClipboard(shareText);
-        alert('Results copied to clipboard!');
+        if (navigator.share) {
+            navigator.share({
+                title: 'Bizzle Results',
+                text: shareText,
+                url: 'https://bizzle.onrender.com/'
+            }).then(() => {
+                console.log('Thanks for sharing!');
+            }).catch(console.error);
+        } else {
+            // Fallback for browsers that do not support the Web Share API
+            copyToClipboard(shareText);
+            alert('Results copied to clipboard!');
+        }
     });
+
+    // document.getElementById('share-results').addEventListener('click', function() {
+    //     copyToClipboard(shareText);
+    //     alert('Results copied to clipboard!');
+    // });
 
     document.querySelectorAll('button[id$="-higher"], button[id$="-lower"]').forEach(button => {
         button.addEventListener('click', function() {

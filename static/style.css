@@ -53,21 +53,9 @@ button {
     box-sizing: border-box; /* Ensure padding and border are included in the height */
 }
 
-button svg.icon {
-    width: 20px; /* Adjust the width as needed */
-    height: 20px; /* Adjust the height as needed */
-    margin-right: 8px; /* Space between the icon and the text */
-    transition: fill 0.3s, stroke 0.3s; /* Smooth transition for color changes */
-    vertical-align: middle; /* Ensure vertical alignment */
-}
-
 button:hover {
     background-color: #990F3D;
     color: #f3e2d9;
-}
-
-button:hover svg.icon g {
-    stroke: #f3e2d9; /* Change the stroke color to match the text color on hover */
 }
 
 button:disabled {
@@ -77,7 +65,7 @@ button:disabled {
     cursor: not-allowed;
 }
 
-#play-again, #share-results {
+#play-again {
     height: 40px; /* Ensure both buttons have the same fixed height */
     padding: 10px 20px; /* Consistent padding for both buttons */
     box-sizing: border-box; /* Ensure padding and border are included in the height */
@@ -85,6 +73,8 @@ button:disabled {
     align-items: center; /* Align items vertically in the center */
     justify-content: center; /* Align items horizontally in the center */
 }
+
+
 
 body {
     font-family: 'TestFinancierDisplay', serif;
