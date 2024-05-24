@@ -1,9 +1,12 @@
 use rocket::{get, post, routes, launch, Build, Rocket, form::{Form, FromForm}, State};
 use rocket::serde::{Deserialize, Serialize, json::Json};
 use rand::seq::SliceRandom;
-use std::{sync::RwLock, fs::File};
+use std::{sync::RwLock, collections::HashMap, fs::File};
 use num_format::{Locale, ToFormattedString};
 use csv::Reader;
+use uuid::Uuid;
+use rocket::http::{Cookie, CookieJar};
+use std::sync::Arc;
 
 #[macro_use] extern crate rocket;
 
@@ -25,13 +28,18 @@ struct Company {
     description: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default, Clone)]
+struct UserStats {
+    total_games: u32,
+    correct_guesses: u32,
+    incorrect_guesses: u32,
+    total_time: u32,
+}
+
+#[derive(Debug, Default)]
 struct AppState {
     selected_company: RwLock<Option<Company>>,
-    total_games: RwLock<u32>,
-    correct_guesses: RwLock<u32>,
-    incorrect_guesses: RwLock<u32>,
-    total_time: RwLock<u32>,
+    user_stats: RwLock<HashMap<String, UserStats>>,
 }
 
 #[derive(FromForm)]
@@ -70,12 +78,15 @@ fn get_random_company(companies: &[Company]) -> Option<&Company> {
 }
 
 #[get("/company")]
-fn company(state: &State<AppState>) -> Result<Json<Company>, &'static str> {
+fn company(state: &State<AppState>, cookies: &CookieJar<'_>) -> Result<Json<Company>, &'static str> {
     let companies = read_csv().map_err(|_| "Failed to read CSV")?;
     let company = get_random_company(&companies).ok_or("No companies available")?;
 
     let mut selected_company = state.selected_company.write().unwrap();
     *selected_company = Some(company.clone());
+
+    let user_id = get_user_id(cookies);
+    cookies.add(Cookie::new("user_id", user_id.clone()));
 
     Ok(Json(company.clone()))
 }
@@ -84,19 +95,18 @@ fn format_billion(value: u64) -> String {
     format!("${:.1}B", value as f64 / 1_000.0)
 }
 
-fn update_guess_counts(state: &State<AppState>, correct: bool) {
-    let mut correct_guesses = state.correct_guesses.write().unwrap();
-    let mut incorrect_guesses = state.incorrect_guesses.write().unwrap();
-    let mut total_games = state.total_games.write().unwrap();
+fn update_guess_counts(state: &State<AppState>, user_id: &str, correct: bool) {
+    let mut user_stats = state.user_stats.write().unwrap();
+    let stats = user_stats.entry(user_id.to_string()).or_default();
 
     if correct {
-        *correct_guesses += 1;
+        stats.correct_guesses += 1;
     } else {
-        *incorrect_guesses += 1;
+        stats.incorrect_guesses += 1;
     }
 
-    if (*correct_guesses + *incorrect_guesses) % 5 == 0 {
-        *total_games += 1;
+    if (stats.correct_guesses + stats.incorrect_guesses) % 5 == 0 {
+        stats.total_games += 1;
     }
 }
 
@@ -112,8 +122,6 @@ fn evaluate_guess(company: &Company, guess_type: &str, estimate: u64, actual: u6
         _ => actual.to_formatted_string(&Locale::en),
     };
 
-    let comparison = if is_correct { "higher" } else { "lower" };
-
     format!(
         "{}! Actual: {}",
         if is_correct { "Correct" } else { "Incorrect" },
@@ -122,9 +130,12 @@ fn evaluate_guess(company: &Company, guess_type: &str, estimate: u64, actual: u6
 }
 
 #[post("/submit_guess", data = "<guess>")]
-fn submit_guess(guess: Form<Guess>, state: &State<AppState>) -> String {
+fn submit_guess(guess: Form<Guess>, state: &State<AppState>, cookies: &CookieJar<'_>) -> String {
     let guess = guess.into_inner();
     let selected_company = state.selected_company.read().unwrap();
+
+    let user_id = get_user_id(cookies);
+    cookies.add(Cookie::new("user_id", user_id.clone()));
 
     if let Some(ref company) = *selected_company {
         let estimates = if company.rank <= 250 {
@@ -154,7 +165,7 @@ fn submit_guess(guess: Form<Guess>, state: &State<AppState>) -> String {
             _ => "Invalid guess".to_string(),
         };
 
-        update_guess_counts(state, result.starts_with("Correct"));
+        update_guess_counts(state, &user_id, result.starts_with("Correct"));
 
         return result;
     }
@@ -162,35 +173,44 @@ fn submit_guess(guess: Form<Guess>, state: &State<AppState>) -> String {
 }
 
 #[get("/stats")]
-fn get_stats(state: &State<AppState>) -> Result<Json<Stats>, &'static str> {
-    let stats = Stats {
-        total_games: *state.total_games.read().unwrap(),
-        correct_guesses: *state.correct_guesses.read().unwrap(),
-        incorrect_guesses: *state.incorrect_guesses.read().unwrap(),
-        total_time: *state.total_time.read().unwrap(),
-    };
+fn get_stats(state: &State<AppState>, cookies: &CookieJar<'_>) -> Result<Json<Stats>, &'static str> {
+    let user_id = get_user_id(cookies);
+    cookies.add(Cookie::new("user_id", user_id.clone()));
 
-    Ok(Json(stats))
+    let user_stats = state.user_stats.read().unwrap();
+    let stats = user_stats.get(&user_id).cloned().unwrap_or_default();
+
+    Ok(Json(Stats {
+        total_games: stats.total_games,
+        correct_guesses: stats.correct_guesses,
+        incorrect_guesses: stats.incorrect_guesses,
+        total_time: stats.total_time,
+    }))
 }
 
 #[post("/stats", data = "<payload>")]
-fn update_stats(state: &State<AppState>, payload: Json<TimePayload>) -> Result<Json<Stats>, &'static str> {
+fn update_stats(state: &State<AppState>, payload: Json<TimePayload>, cookies: &CookieJar<'_>) -> Result<Json<Stats>, &'static str> {
+    let user_id = get_user_id(cookies);
+    cookies.add(Cookie::new("user_id", user_id.clone()));
+
     {
-        let mut total_time = state.total_time.write().unwrap();
-        *total_time += payload.time;
+        let mut user_stats = state.user_stats.write().unwrap();
+        let stats = user_stats.entry(user_id.clone()).or_default();
+        stats.total_time += payload.time;
     }
 
-    get_stats(state)
+    get_stats(state, cookies)
+}
+
+fn get_user_id(cookies: &CookieJar<'_>) -> String {
+    cookies.get("user_id").map_or_else(|| Uuid::new_v4().to_string(), |cookie| cookie.value().to_string())
 }
 
 #[launch]
 fn rocket() -> Rocket<Build> {
     let state = AppState {
         selected_company: RwLock::new(None),
-        total_games: RwLock::new(0),
-        correct_guesses: RwLock::new(0),
-        incorrect_guesses: RwLock::new(0),
-        total_time: RwLock::new(0),
+        user_stats: RwLock::new(HashMap::new()),
     };
     rocket::build()
         .manage(state)

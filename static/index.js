@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch('/company')
         .then(response => response.json())
         .then(data => {
-            document.getElementById('company-name').textContent = `Guess the financials for: ${data.name}`;
+            document.getElementById('company-name').textContent = `Guess the financials: ${data.name}`;
+            document.getElementById('company-ticker').textContent = `Ticker: ${data.ticker}`;
             document.getElementById('company-description').textContent = `Description: ${data.description}`;
             document.getElementById('marketcap-question').textContent = `Is the market cap lower or higher than ${data.rank <= 250 ? "$40.0B" : "$10.0B"}?`;
             document.getElementById('revenue-question').textContent = `Is the revenue lower or higher than ${data.rank <= 250 ? "$30.0B" : "$7.5B"}?`;
@@ -106,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let accuracy = (data.correct_guesses / (data.total_games * 5) * 100).toFixed(2);
         let averageTime = (data.total_time / data.total_games).toFixed(2);
         const overallStats = `I've played ${data.total_games} games and with an average of ${averageTime}s per round with ${accuracy}% accuracy`;
-        const shareLink = `Can you beat me? https://bizzle.onrender.com/`;
+        const shareLink = `Can you beat me?`;
         return `${scoreText}\n${resultIcons}\n${overallStats}\n${shareLink}`;
     }
 
@@ -134,11 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Results copied to clipboard!');
         }
     });
-
-    // document.getElementById('share-results').addEventListener('click', function() {
-    //     copyToClipboard(shareText);
-    //     alert('Results copied to clipboard!');
-    // });
 
     document.querySelectorAll('button[id$="-higher"], button[id$="-lower"]').forEach(button => {
         button.addEventListener('click', function() {
