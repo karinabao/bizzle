@@ -21,11 +21,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     startTimer();
 
-    fetch('/company')
+    fetch('/company', { credentials: 'same-origin' })
         .then(response => response.json())
         .then(data => {
-            document.getElementById('company-name').textContent = `Guess the financials: ${data.name}`;
-            document.getElementById('company-ticker').textContent = `Ticker: ${data.ticker}`;
+            document.getElementById('company-name').textContent = `Guess the financials for: ${data.name}`;
             document.getElementById('company-description').textContent = `Description: ${data.description}`;
             document.getElementById('marketcap-question').textContent = `Is the market cap lower or higher than ${data.rank <= 250 ? "$40.0B" : "$10.0B"}?`;
             document.getElementById('revenue-question').textContent = `Is the revenue lower or higher than ${data.rank <= 250 ? "$30.0B" : "$7.5B"}?`;
@@ -41,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
+            credentials: 'same-origin',
             body: new URLSearchParams({ guess_type: guess }),
         })
         .then(response => response.text())
@@ -58,13 +58,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             score[scoreKey] = data.includes('Correct!') ? 'Correct!' : 'Incorrect';
 
-            console.log(score);
-
             if (score.marketcap !== null && score.revenue !== null && score.profit !== null && score.assets !== null && score.employees !== null) {
                 displayOverallScore();
                 fetch('/stats', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
                     body: JSON.stringify({ time: timer })
                 })
                 .then(response => response.json())
@@ -141,7 +140,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const [metric, guess] = this.id.split('-');
             const responseElementId = `response-${metric}`;
             const buttonIdsToDisable = [`${metric}-higher`, `${metric}-lower`];
-            // console.log(metric, guess, responseElementId, buttonIdsToDisable, metric, this);
             submitGuess(`${metric}_${guess}`, responseElementId, buttonIdsToDisable, metric, this);
         });
     });

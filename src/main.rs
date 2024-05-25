@@ -36,11 +36,33 @@ struct UserStats {
     total_time: u32,
 }
 
+#[derive(Debug, Deserialize, Serialize, Clone)]
+struct Gameplay {
+    user_gameplay: u32, 
+    user_id: String,
+    company: String,
+    industry: String,
+    guess_type: String,
+    correct: bool,
+}
+
+
+#[derive(Debug, Serialize)]
+struct UserStatsView {
+    user_id: String,
+    total_games: u32,
+    correct_guesses: u32,
+    incorrect_guesses: u32,
+    total_time: u32,
+}
+
 #[derive(Debug, Default)]
 struct AppState {
     selected_company: RwLock<Option<Company>>,
     user_stats: RwLock<HashMap<String, UserStats>>,
+    gameplays: RwLock<Vec<Gameplay>>,
 }
+
 
 #[derive(FromForm)]
 struct Guess {
@@ -77,6 +99,27 @@ fn get_random_company(companies: &[Company]) -> Option<&Company> {
     companies.choose(&mut rng)
 }
 
+#[get("/all_user_stats")]
+fn all_user_stats(state: &State<AppState>) -> Json<Vec<UserStatsView>> {
+    let user_stats = state.user_stats.read().unwrap();
+    let stats: Vec<UserStatsView> = user_stats.iter()
+        .map(|(user_id, stats)| UserStatsView {
+            user_id: user_id.clone(),
+            total_games: stats.total_games,
+            correct_guesses: stats.correct_guesses,
+            incorrect_guesses: stats.incorrect_guesses,
+            total_time: stats.total_time,
+        })
+        .collect();
+    Json(stats)
+}
+
+#[get("/all_user_gameplays")]
+fn all_user_gameplays(state: &State<AppState>) -> Json<Vec<Gameplay>> {
+    let gameplays = state.gameplays.read().unwrap();
+    Json(gameplays.clone())
+}
+
 #[get("/company")]
 fn company(state: &State<AppState>, cookies: &CookieJar<'_>) -> Result<Json<Company>, &'static str> {
     let companies = read_csv().map_err(|_| "Failed to read CSV")?;
@@ -95,7 +138,7 @@ fn format_billion(value: u64) -> String {
     format!("${:.1}B", value as f64 / 1_000.0)
 }
 
-fn update_guess_counts(state: &State<AppState>, user_id: &str, correct: bool) {
+fn update_guess_counts(state: &State<AppState>, user_id: &str, guess_type: &str, correct: bool) {
     let mut user_stats = state.user_stats.write().unwrap();
     let stats = user_stats.entry(user_id.to_string()).or_default();
 
@@ -108,6 +151,22 @@ fn update_guess_counts(state: &State<AppState>, user_id: &str, correct: bool) {
     if (stats.correct_guesses + stats.incorrect_guesses) % 5 == 0 {
         stats.total_games += 1;
     }
+    let company_name = state.selected_company.read().unwrap().as_ref().map(|c| c.name.clone()).unwrap_or_default();
+    let company_industry = state.selected_company.read().unwrap().as_ref().map(|c| c.industry.clone()).unwrap_or_default();
+    let gameplay_len = state.gameplays.read().unwrap().len() as u32; // Get the length before the mutable borrow
+
+    let mut user_gameplay = state.gameplays.write().unwrap();
+    
+    user_gameplay.push(Gameplay {
+        user_gameplay: gameplay_len,
+        user_id: user_id.to_string(),
+        company: company_name,
+        industry: company_industry,
+        guess_type: guess_type.split('_').next().unwrap().to_string(),
+        correct: correct,
+    });
+
+    
 }
 
 fn evaluate_guess(company: &Company, guess_type: &str, estimate: u64, actual: u64, unit: &str) -> String {
@@ -165,7 +224,7 @@ fn submit_guess(guess: Form<Guess>, state: &State<AppState>, cookies: &CookieJar
             _ => "Invalid guess".to_string(),
         };
 
-        update_guess_counts(state, &user_id, result.starts_with("Correct"));
+        update_guess_counts(state, &user_id, guess.guess_type.as_str(), result.starts_with("Correct"));
 
         return result;
     }
@@ -211,9 +270,10 @@ fn rocket() -> Rocket<Build> {
     let state = AppState {
         selected_company: RwLock::new(None),
         user_stats: RwLock::new(HashMap::new()),
+        gameplays: RwLock::new(Vec::new()),
     };
     rocket::build()
         .manage(state)
-        .mount("/", routes![company, submit_guess, get_stats, update_stats])
+        .mount("/", routes![company, submit_guess, get_stats, update_stats, all_user_stats, all_user_gameplays])
         .mount("/", rocket::fs::FileServer::from(rocket::fs::relative!("static")))
 }
