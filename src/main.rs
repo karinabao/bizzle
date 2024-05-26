@@ -7,6 +7,8 @@ use csv::Reader;
 use uuid::Uuid;
 use rocket::http::{Cookie, CookieJar};
 use std::sync::Arc;
+use chrono::NaiveDateTime;
+use chrono::Utc;
 
 #[macro_use] extern crate rocket;
 
@@ -39,6 +41,7 @@ struct UserStats {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 struct Gameplay {
     user_gameplay: u32, 
+    time_stamp: NaiveDateTime,
     user_id: String,
     company: String,
     industry: String,
@@ -141,6 +144,7 @@ fn format_billion(value: u64) -> String {
 fn update_guess_counts(state: &State<AppState>, user_id: &str, guess_type: &str, correct: bool) {
     let mut user_stats = state.user_stats.write().unwrap();
     let stats = user_stats.entry(user_id.to_string()).or_default();
+    let timestamp = Utc::now().naive_utc(); // Get the current timestamp
 
     if correct {
         stats.correct_guesses += 1;
@@ -159,6 +163,7 @@ fn update_guess_counts(state: &State<AppState>, user_id: &str, guess_type: &str,
     
     user_gameplay.push(Gameplay {
         user_gameplay: gameplay_len,
+        time_stamp: timestamp,
         user_id: user_id.to_string(),
         company: company_name,
         industry: company_industry,
